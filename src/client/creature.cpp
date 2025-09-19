@@ -921,6 +921,8 @@ uint16 Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
     float factor = 3;
     if (g_game.getClientVersion() <= 810)
         factor = 2;
+    else if (g_game.getClientVersion() <= 860)
+        factor = 1.2; // Further optimized factor for version 860 - even faster movement
 
     interval = std::max<int>(interval, g_game.getServerBeat());
 
@@ -928,7 +930,8 @@ uint16 Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
                             m_lastStepDirection == Otc::SouthWest || m_lastStepDirection == Otc::SouthEast))
         interval *= factor;
 
-    if (!isServerWalking() && g_game.getFeature(Otc::GameSlowerManualWalking)) {
+    // Skip the GameSlowerManualWalking penalty for version 860 and below for better responsiveness
+    if (!isServerWalking() && g_game.getFeature(Otc::GameSlowerManualWalking) && g_game.getClientVersion() > 860) {
         interval += 25;
     }
     if (isServerWalking() && g_game.getFeature(Otc::GameNewWalking) && m_stepDuration > 0) // just use server value

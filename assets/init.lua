@@ -1,27 +1,27 @@
--- CONFIG
-APP_NAME = "otclientv8-linux"  -- Linux exclusive client
-APP_VERSION = 1341             -- client version for updater and login to identify outdated client
-DEFAULT_LAYOUT = "retro"       -- Desktop layout optimized for Linux
+-- CONFIG - OTClient 8.6 Native Linux Edition
+APP_NAME = "otclient86-linux"    -- Tibia 8.6 exclusive client
+APP_VERSION = 860                -- Hardcoded for Tibia 8.6 protocol
+DEFAULT_LAYOUT = "retro"         -- Optimized layout for 8.6
 
--- If you don't use updater or other service, set it to updater = ""
+-- Services disabled for 8.6 simplicity
 Services = {
-  website = "https://docs.opentibiabr.com/",
-  updater = "",--"http://yourwebsite/api/updater.php"
-  stats = "", -- --"http://yourwebsite/api/stats.php"
-  crash = "", --"http://yourwebsite/api/crash.php",
-  feedback = "",--"http://yourwebsite/api/feedback.php",
-  status = "" --http://yourwebsite/api/status.php"
+  website = "",
+  updater = "",
+  stats = "",
+  crash = "",
+  feedback = "",
+  status = ""
 }
 
--- Servers accept http login url, websocket login url or ip:port:version
+-- Simple server configuration - only IP:PORT needed (8.6 protocol hardcoded)
 Servers = {
-  ["Baiak-Fury"] = "ot.geniumot.com:7171:860"
+  ["Baiak-Fury"] = "baiakeiros.com.br:7171"  -- No version needed - always 8.6
 }
 
---Server = "ws://yourwebsite:3000/"
---Server = "ws://127.0.0.1:88/"
---USE_NEW_ENERGAME = true -- uses entergamev2 based on websockets instead of entergame
-ALLOW_CUSTOM_SERVERS = false -- if true it shows option ANOTHER on server list
+-- Simplified configuration for 8.6 only
+ALLOW_CUSTOM_SERVERS = true     -- Allow easy server IP input
+HARDCODED_CLIENT_VERSION = 860  -- Force 8.6 protocol
+HARDCODED_PROTOCOL_VERSION = 860
 
 g_app.setName("OTCv8 Linux")
 -- CONFIG END

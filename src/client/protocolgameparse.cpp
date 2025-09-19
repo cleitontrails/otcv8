@@ -1807,7 +1807,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
         int timeUntilFreeReroll = g_game.getProtocolVersion() >= 1252 ? msg->getU32() : msg->getU16();
         uint8_t lockType = g_game.getFeature(Otc::GameTibia12Protocol) ? msg->getU8() : 0;
         return g_lua.callGlobalField("g_game", "onPreySelection", slot, bonusType, bonusValue, bonusGrade, names, outfits, timeUntilFreeReroll, lockType);
-    } else if (state == Otc::PREY_ACTION_CHANGE_FROM_ALL) {
+    } else if (state == Otc::PREY_STATE_CHANGE_FROMALL) {
         Otc::PreyBonusType_t bonusType = (Otc::PreyBonusType_t)msg->getU8();
         int bonusValue = msg->getU16();
         int bonusGrade = msg->getU8();

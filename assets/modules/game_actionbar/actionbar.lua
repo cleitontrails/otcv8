@@ -316,8 +316,10 @@ function onDropActionButton(self, mousePosition, mouseButton)
     end
   end
 
-  cachedSettings.widget.item:setBorderColor('#00000000')
-  cachedSettings = nil
+  if cachedSettings then
+    cachedSettings.widget.item:setBorderColor('#00000000')
+    cachedSettings = nil
+  end
   g_mouse.popCursor('target')
   self:ungrabMouse()
 end
@@ -418,6 +420,16 @@ function setupButton(widget)
 
     self:setBorderColor('#FFFFFF')
     cachedSettings = {id=widget:getId(), data=settings[widget:getId()], widget=widget}
+  end
+
+  widget.item.onDragLeave = function(self)
+    -- Ensure cursor is reset if drag is cancelled
+    if cachedSettings and cachedSettings.widget == widget then
+      self:setBorderColor('#00000000')
+      cachedSettings = nil
+      g_mouse.popCursor('target')
+      mouseGrabberWidget:ungrabMouse()
+    end
   end
 
   -- popupmenu & execute action

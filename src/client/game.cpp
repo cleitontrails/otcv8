@@ -44,9 +44,10 @@ Game g_game;
 
 Game::Game()
 {
-    m_protocolVersion = 0;
+    // Hardcoded for Tibia 8.6 native client
+    m_protocolVersion = 860;
     m_clientCustomOs = -1;
-    m_clientVersion = 0;
+    m_clientVersion = 860;  // Always 8.6
     m_online = false;
     m_denyBotCall = false;
     m_dead = false;

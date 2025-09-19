@@ -32,6 +32,8 @@
 
 #include <sys/stat.h>
 #include <execinfo.h>
+#include <sys/wait.h>
+#include <fstream>
 
 void Platform::processArgs(std::vector<std::string>& args)
 {
@@ -95,7 +97,15 @@ std::string Platform::getCurrentDir()
 
 bool Platform::copyFile(std::string from, std::string to)
 {
-    return system(stdext::format("/bin/cp '%s' '%s'", from, to).c_str()) == 0;
+    // Use safer alternative to avoid command injection
+    std::ifstream src(from, std::ios::binary);
+    if (!src.is_open()) return false;
+
+    std::ofstream dst(to, std::ios::binary);
+    if (!dst.is_open()) return false;
+
+    dst << src.rdbuf();
+    return src.good() && dst.good();
 }
 
 bool Platform::fileExists(std::string file)
@@ -121,11 +131,29 @@ ticks_t Platform::getFileModificationTime(std::string file)
 
 bool Platform::openUrl(std::string url, bool now)
 {
+    // Validate URL to prevent command injection
+    if (url.find(';') != std::string::npos || url.find('&') != std::string::npos ||
+        url.find('|') != std::string::npos || url.find('`') != std::string::npos) {
+        g_logger.error("Invalid characters in URL: " + url);
+        return false;
+    }
+
     if(now) {
-        return system(stdext::format("xdg-open %s", url).c_str()) == 0;
+        const char* args[] = {"xdg-open", url.c_str(), nullptr};
+        pid_t pid = fork();
+        if (pid == 0) {
+            execvp("xdg-open", const_cast<char* const*>(args));
+            _exit(1);
+        }
+        return pid > 0;
     } else {
         g_dispatcher.scheduleEvent([url] {
-            system(stdext::format("xdg-open %s", url).c_str());
+            const char* args[] = {"xdg-open", url.c_str(), nullptr};
+            pid_t pid = fork();
+            if (pid == 0) {
+                execvp("xdg-open", const_cast<char* const*>(args));
+                _exit(1);
+            }
         }, 50);
     }
     return true;
@@ -133,11 +161,29 @@ bool Platform::openUrl(std::string url, bool now)
 
 bool Platform::openDir(std::string path, bool now)
 {
+    // Validate path to prevent command injection
+    if (path.find(';') != std::string::npos || path.find('&') != std::string::npos ||
+        path.find('|') != std::string::npos || path.find('`') != std::string::npos) {
+        g_logger.error("Invalid characters in path: " + path);
+        return false;
+    }
+
     if(now) {
-        return system(stdext::format("xdg-open %s", path).c_str()) == 0;
+        const char* args[] = {"xdg-open", path.c_str(), nullptr};
+        pid_t pid = fork();
+        if (pid == 0) {
+            execvp("xdg-open", const_cast<char* const*>(args));
+            _exit(1);
+        }
+        return pid > 0;
     } else {
         g_dispatcher.scheduleEvent([path] {
-            system(stdext::format("xdg-open %s", path).c_str());
+            const char* args[] = {"xdg-open", path.c_str(), nullptr};
+            pid_t pid = fork();
+            if (pid == 0) {
+                execvp("xdg-open", const_cast<char* const*>(args));
+                _exit(1);
+            }
         }, 50);
     }
     return true;

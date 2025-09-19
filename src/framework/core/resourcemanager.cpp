@@ -67,8 +67,10 @@ void ResourceManager::terminate()
 
 bool launchProcess(const std::string& command)
 {
-    int exitCode = std::system(command.c_str());
-    return exitCode == 0;
+    // SECURITY: Avoid system() call to prevent command injection
+    // This function should be refactored to use execvp() with proper argument parsing
+    g_logger.error("launchProcess() called with potentially unsafe command: " + command);
+    return false; // Disabled for security
 }
 
 bool ResourceManager::launchCorrect(const std::vector<std::string>& args, const std::string& product, const std::string& app) { // curently works only on windows

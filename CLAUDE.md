@@ -11,8 +11,9 @@ OTClientV8 Linux is an alternative Tibia client built exclusively for Linux with
 This project uses CMake with vcpkg for dependency management:
 
 - **Build Configuration**: Use CMake with the vcpkg toolchain file
-- **Dependencies**: Managed through vcpkg.json, includes asio, luajit, glew, physfs, openal-soft, openssl, and others
+- **Dependencies**: Managed through vcpkg.json, installed to `libs/` directory
 - **Platform**: Linux only (X11/Wayland compatible)
+- **Output**: Clean deployment created in `build/` directory with executable and all assets
 
 ### Build Commands
 
@@ -20,8 +21,11 @@ This project uses CMake with vcpkg for dependency management:
 # Configure with vcpkg (set VCPKG_ROOT environment variable first)
 cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake .
 
-# Build
-cmake --build .
+# Build (creates executable and assets in build/ directory)
+cmake --build . --parallel $(nproc)
+
+# Run
+cd build && ./otclient
 ```
 
 ### Build Options
@@ -54,9 +58,32 @@ cmake --build .
 
 4. **Rendering Pipeline**: Optimized OpenGL rendering with X11 window management, adaptive rendering, and 60fps target
 
+### Project Structure
+
+```
+/
+├── src/           # C++ source code
+├── assets/        # Game assets (source files)
+│   ├── data/      # Images, sounds, fonts, shaders, styles
+│   ├── modules/   # Lua modules and game logic
+│   ├── layouts/   # UI layout configurations
+│   ├── mods/      # Game modifications and extensions
+│   └── init.lua   # Main configuration template
+├── libs/          # vcpkg dependencies (auto-generated)
+├── build/         # Clean deployment (auto-generated)
+│   ├── otclient   # Executable (ready to run)
+│   ├── data/      # Copied game assets
+│   ├── modules/   # Copied Lua modules
+│   ├── layouts/   # Copied UI layouts
+│   ├── mods/      # Copied modifications
+│   └── init.lua   # Configuration file
+└── cmake/         # CMake modules and helpers
+```
+
 ### Configuration
 
-- **`init.lua`**: Main configuration file defining app settings, servers, and services
+- **`assets/init.lua`**: Main configuration template defining app settings, servers, and services
+- **`build/init.lua`**: Generated configuration file (copied from assets during build)
 - Configuration includes app name, version, default layout, service URLs, and server connections
 - Modular loading system with automatic discovery and priority-based initialization
 

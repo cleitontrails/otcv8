@@ -302,10 +302,14 @@ function UIMiniWindow:onDragMove(mousePos, mouseMoved)
   end
 
   if not overAnyWidget and self.movedWidget then
-    self.setMovedChildMargin(self.movedOldMargin or 0)
+    if self.setMovedChildMargin then
+      self.setMovedChildMargin(self.movedOldMargin or 0)
+    end
     self.movedWidget = nil
   end
-  self.setMovedChildMargin(0)
+  if self.setMovedChildMargin then
+    self.setMovedChildMargin(0)
+  end
 
   return UIWindow.onDragMove(self, mousePos, mouseMoved)
 end
