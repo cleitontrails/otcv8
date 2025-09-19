@@ -40,7 +40,9 @@
 #include <GLES3/gl3.h>
 #else
 #ifndef _MSC_VER
+#ifndef GLEW_STATIC
 #define GLEW_STATIC
+#endif
 #endif
 #include <GL/glew.h>
 #endif

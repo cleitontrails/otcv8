@@ -31,9 +31,9 @@ class OTMLException : public stdext::exception
 public:
     OTMLException(const OTMLNodePtr& node, const std::string& error);
     OTMLException(const OTMLDocumentPtr& doc, const std::string& error, int line = -1);
-    virtual ~OTMLException() throw() { };
+    virtual ~OTMLException() noexcept { };
 
-    virtual const char* what() const throw() { return m_what.c_str(); }
+    virtual const char* what() const noexcept { return m_what.c_str(); }
 
 protected:
     std::string m_what;

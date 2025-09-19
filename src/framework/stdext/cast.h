@@ -137,14 +137,14 @@ inline bool cast(const bool& in, std::string& out) {
 // used by safe_cast
 class cast_exception : public exception {
 public:
-    virtual ~cast_exception() throw() { }
+    virtual ~cast_exception() noexcept { }
     template<class T, class R>
     void update_what() {
         std::stringstream ss;
         ss << "failed to cast value of type '" << demangle_type<T>() << "' to type '" << demangle_type<R>() << "'";
         m_what = ss.str();
     }
-    virtual const char* what() const throw() { return m_what.c_str(); }
+    virtual const char* what() const noexcept { return m_what.c_str(); }
 private:
     std::string m_what;
 };

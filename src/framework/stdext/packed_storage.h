@@ -61,12 +61,20 @@ public:
     }
 
     bool remove(Key id) {
+        if(m_size == 0)
+            return false;
         auto begin = m_values;
         auto end = m_values + m_size;
-        auto it = std::find_if(begin, end, [=](const value_pair& pair) -> bool { return pair.id == id; } );
+        auto it = std::find_if(begin, end, [id](const value_pair& pair) -> bool { return pair.id == id; } );
         if(it == end)
             return false;
         int pos = it - begin;
+        if(m_size == 1) {
+            delete[] m_values;
+            m_values = nullptr;
+            m_size = 0;
+            return true;
+        }
         auto tmp = new value_pair[m_size-1];
         std::copy(begin, begin + pos, tmp);
         std::copy(begin + pos + 1, end, tmp + pos);
