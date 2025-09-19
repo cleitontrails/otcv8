@@ -187,7 +187,7 @@ void OTMLParser::parseNode(const std::string& data)
     if (value == "~") {
     node->setNull(true);
     } else {
-        if (value.front() == '[' && value.back() == ']') {
+        if (!value.empty() && value.front() == '[' && value.back() == ']') {
             std::string tmp = value.substr(1, value.length() - 2);
             std::istringstream iss(tmp);
             std::string v;
