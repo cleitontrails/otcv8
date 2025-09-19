@@ -42,18 +42,15 @@ int main(int argc, const char* argv[]) {
     g_logger.setLogFile(compactName + ".log");
 
     // setup application name and version
-    g_app.setName("OTClientV8");
+    g_app.setName("OTClientV8 Linux");
     g_app.setCompactName(compactName);
-    g_app.setVersion("3.2");
+    g_app.setVersion("3.2-linux");
 
 #ifdef WITH_ENCRYPTION
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
         g_lua.init();
         g_resources.encrypt(args.size() >= 3 ? args[2] : "");
         std::cout << "Encryption complete" << std::endl;
-#ifdef WIN32
-        MessageBoxA(NULL, "Encryption complete", "Success", 0);
-#endif
         return 0;
     }
 #endif
@@ -95,11 +92,7 @@ int main(int argc, const char* argv[]) {
         }
     }
 
-#ifdef WIN32
-    // support for progdn proxy system, if you don't have this dll nothing will happen
-    // however, it is highly recommended to use otcv8 proxy system
-    LoadLibraryA("progdn32.dll");
-#endif
+// Linux: No special proxy DLL needed
 
     // the run application main loop
     g_app.run();
@@ -118,42 +111,3 @@ int main(int argc, const char* argv[]) {
     return 0;
 }
 
-#ifdef ANDROID
-#include <framework/platform/androidwindow.h>
-
-android_app* g_androidState = nullptr;
-void android_main(struct android_app* state)
-{
-    g_mainThreadId = g_dispatcherThreadId = g_graphicsThreadId = std::this_thread::get_id();
-    g_androidState = state;
-
-    state->userData = nullptr;
-    state->onAppCmd = +[](android_app* app, int32_t cmd) -> void {
-       return g_androidWindow.handleCmd(cmd);
-    };
-    state->onInputEvent = +[](android_app* app, AInputEvent* event) -> int32_t {
-        return g_androidWindow.handleInput(event);
-    };
-    state->activity->callbacks->onNativeWindowResized = +[](ANativeActivity* activity, ANativeWindow* window) -> void {
-        g_graphicsDispatcher.scheduleEventEx("updateWindowSize", [] {
-            g_androidWindow.updateSize();
-        }, 500);
-    };
-    state->activity->callbacks->onContentRectChanged = +[](ANativeActivity* activity, const ARect* rect) -> void {
-        g_graphicsDispatcher.scheduleEventEx("updateWindowSize", [] {
-            g_androidWindow.updateSize();
-        }, 500);
-    };
-
-    bool terminated = false;
-    g_window.setOnClose([&] {
-        terminated = true;
-    });
-    while(!g_window.isVisible() && !terminated)
-        g_window.poll(); // init window
-    // run app
-    const char* args[] = { "otclientv8.apk" };
-    main(1, args);
-    std::exit(0); // required!
-}
-#endif

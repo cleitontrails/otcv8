@@ -5,9 +5,9 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 # git clone https://github.com/Kitware/CMake/; cd CMake
 # ./bootstrap && make && sudo make install
 
-# VCPKG
+# VCPKG for Linux
 # cmake -DCMAKE_TOOLCHAIN_FILE=/opt/workspace/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-# .\vcpkg --triplet x64-windows asio luajit glew physfs openal-soft libogg libvorbis zlib opengl nlohmann-json protobuf liblzma openssl
+# ./vcpkg --triplet x64-linux install
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 	set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
@@ -38,7 +38,7 @@ include(LoggingHelper)
 # *****************************************************************************
 # Options
 # *****************************************************************************
-option(OPTIONS_ENABLE_CCACHE "Enable ccache" OFF)
+option(OPTIONS_ENABLE_CCACHE "Enable ccache" ON)
 option(OPTIONS_ENABLE_SCCACHE "Use sccache to speed up compilation process" OFF)
 option(OPTIONS_ENABLE_IPO "Check and Enable interprocedural optimization (IPO/LTO)" ON)
 

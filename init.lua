@@ -1,7 +1,7 @@
 -- CONFIG
-APP_NAME = "otclientv8"  -- important, change it, it's name for config dir and files in appdata
-APP_VERSION = 1341       -- client version for updater and login to identify outdated client
-DEFAULT_LAYOUT = "retro" -- on android it's forced to "mobile", check code bellow
+APP_NAME = "otclientv8-linux"  -- Linux exclusive client
+APP_VERSION = 1341             -- client version for updater and login to identify outdated client
+DEFAULT_LAYOUT = "retro"       -- Desktop layout optimized for Linux
 
 -- If you don't use updater or other service, set it to updater = ""
 Services = {
@@ -23,7 +23,7 @@ Servers = {
 --USE_NEW_ENERGAME = true -- uses entergamev2 based on websockets instead of entergame
 ALLOW_CUSTOM_SERVERS = true -- if true it shows option ANOTHER on server list
 
-g_app.setName("OTCv8")
+g_app.setName("OTCv8 Linux")
 -- CONFIG END
 
 -- print first terminal message
@@ -44,9 +44,7 @@ g_configs.loadSettings("/config.otml")
 -- set layout
 local settings = g_configs.getSettings()
 local layout = DEFAULT_LAYOUT
-if g_app.isMobile() then
-  layout = "mobile"
-elseif settings:exists('layout') then
+if settings:exists('layout') then
   layout = settings:getValue('layout')
 end
 g_resources.setLayout(layout)

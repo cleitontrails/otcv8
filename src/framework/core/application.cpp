@@ -65,9 +65,7 @@ Application::Application()
     m_appVersion = "none";
     m_charset = "cp1252";
     m_stopping = false;
-#ifdef ANDROID
-    m_mobile = true;
-#endif
+    m_mobile = false; // Linux desktop application
 }
 
 void Application::init(std::vector<std::string>& args)
@@ -217,16 +215,6 @@ void Application::restartArgs(const std::vector<std::string>& args)
 
 std::string Application::getOs()
 {
-#if defined(ANDROID)
-    return "android";
-#elif defined(WIN32)
-    return "windows";
-#elif defined(__APPLE__)
-    return "mac";
-#elif __linux
     return "linux";
-#else
-    return "unknown";
-#endif
 }
 

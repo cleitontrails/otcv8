@@ -1,6 +1,7 @@
 {
-  "name": "otcv8",
+  "name": "otcv8-linux",
   "version-string": "1.0.0",
+  "description": "OTClientV8 - Linux exclusive Tibia client",
   "dependencies": [
     "asio",
     "bzip2",
@@ -14,15 +15,7 @@
     "liblzma",
     "zlib",
     "libzip",
-    "stduuid",
-    {
-      "name": "angle",
-      "platform": "windows"
-    },
-    {
-      "name": "directxsdk",
-      "platform": "windows"
-    }
+    "stduuid"
   ],
   "builtin-baseline": "0d1150cbd2f8b3eb9247c51c9f41efbb3be9454b"
 }

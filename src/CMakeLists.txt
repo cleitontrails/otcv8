@@ -8,7 +8,6 @@ option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
 option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
 option(TOGGLE_FRAMEWORK_EDITOR "Use Editor " OFF)
-option(TOGGLE_DIRECTX "Use DX9 support" OFF)
 option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
 option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
 option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
@@ -73,19 +72,13 @@ set(VERSION "1.0.0")
 # *****************************************************************************
 # Client
 # *****************************************************************************
-if (MSVC)
-	add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
-else()
-	add_executable(${PROJECT_NAME} "")
-endif()
+add_executable(${PROJECT_NAME} "")
 
 # *****************************************************************************
-# Build flags
+# Build flags for Linux (GCC/Clang)
 # *****************************************************************************
-if (NOT MSVC)
-	if (CMAKE_COMPILER_IS_GNUCXX)
-		target_compile_options(${PROJECT_NAME}  PRIVATE  -Wno-deprecated-declarations)
-	endif()
+if (CMAKE_COMPILER_IS_GNUCXX)
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
 endif()
 
 if(THREADS_HAVE_PTHREAD_ARG)
@@ -104,13 +97,8 @@ endif()
 # === ASAN ===
 if(ASAN_ENABLED)
   log_option_enabled("asan")
-
-  if(MSVC)
-	target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
-  else()
-	target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
-	target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
-  endif()
+  target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+  target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
 else()
   log_option_disabled("asan")
 endif()
@@ -137,14 +125,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-# Multiprocessor compiller
-if(CMake_MSVC_PARALLEL)
-	if(CMake_MSVC_PARALLEL GREATER 0)
-		add_definitions(/MP${CMake_MSVC_PARALLEL})
-	else()
-		add_definitions(/MP)
-	endif()
-endif()
+# Linux parallel compilation is handled by make -j
 
 
 # Client options
@@ -153,7 +134,6 @@ add_definitions(-DCLIENT)
 if(TOGGLE_BOT_PROTECTION)
 	add_definitions(-DBOT_PROTECTION)
 endif(TOGGLE_BOT_PROTECTION)
-add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 
@@ -188,9 +168,7 @@ find_package(OpenAL REQUIRED)
 find_package(VorbisFile REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
-if(UNIX AND NOT ANDROID)
-	find_package(X11 REQUIRED)
-endif()
+find_package(X11 REQUIRED)
 
 # *****************************************************************************
 # OTClient source files configuration
@@ -302,8 +280,6 @@ set(SOURCE_FILES
 
 	# crash handler
 	framework/platform/unixcrashhandler.cpp
-	framework/platform/win32crashhandler.cpp
-	framework/platform/win32platform.cpp
 	framework/platform/unixplatform.cpp
 	framework/platform/platform.cpp
 	framework/graphics/animatedtexture.cpp
@@ -346,9 +322,7 @@ set(SOURCE_FILES
 
 	# platform window
 	framework/platform/platformwindow.cpp
-	framework/platform/win32window.cpp
 	framework/platform/x11window.cpp
-	framework/platform/sdlwindow.cpp
 
 	# window input
 	framework/input/mouse.cpp
@@ -387,132 +361,45 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 # Includes and librarys
 # *****************************************************************************
 
-if(WIN32)
-    find_library(IPHLPAPI_LIBRARY iphlpapi)
-    find_library(PSAPI_LIBRARY psapi)
-    find_library(BCRYPT_LIBRARY bcrypt)
-    find_library(DBGHELP_LIBRARY dbghelp)
-    find_library(SHLWAPI_LIBRARY shlwapi)
-endif()
+# Linux system libraries are handled by find_package below
 
-if(MSVC)
+# Linux build configuration
+target_include_directories(${PROJECT_NAME}
+	PRIVATE
+	${CMAKE_SOURCE_DIR}/src
+	${LUAJIT_INCLUDE_DIR}
+	${CMAKE_THREAD_LIBS_INIT}
+	${GMP_INCLUDE_DIR}
+	${OPENSSL_INCLUDE_DIR}
+	${PHYSFS_INCLUDE_DIR}
+	${GLEW_INCLUDE_DIR}
+	${PARALLEL_HASHMAP_INCLUDE_DIRS}
+	${NLOHMANN_JSON_INCLUDE_DIR}
+)
+target_link_libraries(${PROJECT_NAME}
+	PRIVATE
+	${LUAJIT_LIBRARY}
+	${PHYSFS_LIBRARY}
+	${ZLIB_LIBRARY}
+	${NLOHMANN_JSON_LIBRARY}
+	${GLEW_LIBRARY}
+	${OPENGL_LIBRARIES}
+	${OGG_LIBRARY}
+	${GMP_LIBRARY}
+	${OPENSSL_LIBRARIES}
+	${STDUUID}
 
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
-	elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-	elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-	endif()
+	Threads::Threads
+	X11::X11
+	asio::asio
+	OpenAL::OpenAL
+	Vorbis::vorbis
+	Vorbis::vorbisfile
+	pugixml::pugixml
+	libzip::zip
+)
 
-	if(BUILD_STATIC_LIBRARY)
-		log_option_enabled("STATIC_LIBRARY")
-		set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-		find_package(Vorbis REQUIRED)
-		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	else()
-		log_option_disabled("STATIC_LIBRARY")
-		target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
-	endif()
-
-	target_include_directories(${PROJECT_NAME}
-		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
-		${LUAJIT_INCLUDE_DIR}
-		${VORBISFILE_INCLUDE_DIR}
-		${GMP_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
-		${PHYSFS_INCLUDE_DIR}
-		${PARALLEL_HASHMAP_INCLUDE_DIRS}
-		${NLOHMANN_JSON_INCLUDE_DIR}
-	)
-	target_link_libraries(${PROJECT_NAME}
-		PRIVATE
-		${LUAJIT_LIBRARY}
-		${CMAKE_THREAD_LIBS_INIT}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
-		${OPENGL_LIBRARIES}
-		${DirectX_LIBRARY}
-		${DirectX_LIBRARIES}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
-		${GMP_LIBRARY}
-		${OPENSSL_LIBRARIES}
-		${STDUUID}
-
-		${IPHLPAPI_LIBRARY}
-		${PSAPI_LIBRARY}
-		${BCRYPT_LIBRARY}
-		${DBGHELP_LIBRARY}
-		${SHLWAPI_LIBRARY}
-
-		Threads::Threads
-		GLEW::GLEW
-		asio::asio
-		OpenAL::OpenAL
-		winmm.lib
-		pugixml::pugixml
-		libzip::zip
-	)
-else()
-	target_include_directories(${PROJECT_NAME}
-		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
-		${LUAJIT_INCLUDE_DIR}
-		${CMAKE_THREAD_LIBS_INIT}
-		${GMP_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
-		${PHYSFS_INCLUDE_DIR}
-		${GLEW_INCLUDE_DIR}
-		${PARALLEL_HASHMAP_INCLUDE_DIRS}
-		${NLOHMANN_JSON_INCLUDE_DIR}
-	)
-	target_link_libraries(${PROJECT_NAME}
-		PRIVATE
-		${LUAJIT_LIBRARY}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
-		${GLEW_LIBRARY}
-		${OPENGL_LIBRARIES}
-		${DirectX_LIBRARY}
-		${DirectX_LIBRARIES}
-		${OGG_LIBRARY}
-		${GMP_LIBRARY}
-		${OPENSSL_LIBRARIES}
-		${STDUUID}
-		${FOUNDATION}
-		${IOKIT}
-
-		Threads::Threads
-		X11::X11
-		asio::asio
-		OpenAL::OpenAL
-		Vorbis::vorbis
-		Vorbis::vorbisfile
-		pugixml::pugixml
-		libzip::zip
-	)
-endif()
-
-# *****************************************************************************
-# Enable otclient console only for debug build and release deb info
-# *****************************************************************************
-if(WIN32)
-	set_target_properties(${PROJECT_NAME}
-	PROPERTIES
-		LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
-		LINK_FLAGS_RELEASE "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-		LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE"
-		LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-	)
-endif(WIN32)
+# Linux console support is built-in (no special configuration needed)
 
 # *****************************************************************************
 # Link compilation files folder

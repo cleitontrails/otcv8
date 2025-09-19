@@ -22,29 +22,15 @@
 
 #include "platformwindow.h"
 
-#if defined(WIN32)
-#include "win32window.h"
-WIN32Window window;
-#elif defined(ANDROID)
-#include "androidwindow.h"
-#elif defined(__EMSCRIPTEN__)
-#include "sdlwindow.h"
-SDLWindow window;
-#else
 #include "x11window.h"
 #include <framework/core/clock.h>
 X11Window window;
-#endif
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/image.h>
 
-#ifdef ANDROID
-PlatformWindow& g_window = g_androidWindow;
-#else
 PlatformWindow& g_window = window;
-#endif
 
 int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpot)
 {
