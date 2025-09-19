@@ -320,7 +320,6 @@ bool SpriteManager::loadCasualSpr(std::string file)
 
         m_spritesFile = g_resources.openFile(file, g_game.getFeature(Otc::GameDontCacheFiles));
 
-
         m_signature = m_spritesFile->getU32();
         if (m_signature == *((uint32_t*)"OTV8")) {
             m_signature = m_spritesFile->getU32();
