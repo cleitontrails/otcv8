@@ -14,6 +14,7 @@ option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OF
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
 option(BUILD_STATIC_LIBRARY "Build using static libraries" OFF)
+option(WITH_ENCRYPTION "Enable encryption support for Tibia data files" ON)
 
 # *****************************************************************************
 # Cmake Features
@@ -134,6 +135,13 @@ add_definitions(-DCLIENT)
 if(TOGGLE_BOT_PROTECTION)
 	add_definitions(-DBOT_PROTECTION)
 endif(TOGGLE_BOT_PROTECTION)
+# Set encryption support
+if(WITH_ENCRYPTION)
+	add_definitions(-DWITH_ENCRYPTION)
+	message(STATUS "Encryption support: ON")
+else()
+	message(STATUS "Encryption support: OFF")
+endif(WITH_ENCRYPTION)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 
