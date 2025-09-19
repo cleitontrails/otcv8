@@ -47,16 +47,47 @@ export VCPKG_ROOT=/path/to/vcpkg
 #### Compile
 
 ```bash
-# Configure
-cmake --preset linux-release
+# Configure with vcpkg
+cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake .
 
 # Build
-cmake --build build/linux-release
+cmake --build . --parallel $(nproc)
+```
+
+#### Project Structure
+
+After building, the project creates a clean deployment in the `package/` directory:
+
+```
+/
+├── src/           # Source code (C++)
+├── assets/        # Game assets (source)
+│   ├── data/      # Images, sounds, fonts
+│   ├── modules/   # Lua modules
+│   ├── layouts/   # UI layouts
+│   ├── mods/      # Game modifications
+│   ├── init.lua   # Configuration file
+│   └── initExample.lua # Template configuration
+├── package/       # Clean deployment directory
+│   ├── otclient   # Executable
+│   ├── data/      # Game assets
+│   ├── modules/   # Lua modules
+│   ├── layouts/   # UI layouts
+│   ├── mods/      # Game modifications
+│   └── init.lua   # Configuration file
+└── build/         # CMake build artifacts
+```
+
+#### Running
+
+```bash
+cd package
+./otclient
 ```
 
 #### Configuration
 
-Edit `init.lua` to configure servers, services, and client settings.
+Edit `assets/init.lua` to configure servers, services, and client settings before building, or edit `package/init.lua` in the deployed version.
 
 ### Credits
 

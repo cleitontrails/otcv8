@@ -18,6 +18,7 @@ endif()
 
 set(VCPKG_FEATURE_FLAGS "versions")
 set(VCPKG_BUILD_TYPE "release")
+set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/libs")
 
 # *****************************************************************************
 # Project otclient

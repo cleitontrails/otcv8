@@ -8,7 +8,7 @@ option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
 option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
 option(TOGGLE_FRAMEWORK_EDITOR "Use Editor " OFF)
-option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
+option(TOGGLE_BIN_FOLDER "Use build folder for complete deployment with assets" ON)
 option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
 option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OFF)
 option(DEBUG_LOG "Enable Debug Log" OFF)
@@ -413,12 +413,69 @@ target_link_libraries(${PROJECT_NAME}
 # Link compilation files folder
 # *****************************************************************************
 
-## Link compilation files to build/bin folder, else link to the main dir
+## Link compilation files to build folder, else link to the main dir
 if (TOGGLE_BIN_FOLDER)
 	set_target_properties(${PROJECT_NAME}
 		PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 	)
+
+	# *****************************************************************************
+	# Create clean build directory for distribution
+	# *****************************************************************************
+
+	# Define build output directory
+	set(PACKAGE_DIR "${CMAKE_SOURCE_DIR}/build")
+
+	# Create build directory
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PACKAGE_DIR}
+		COMMENT "Creating clean build directory"
+	)
+
+	# Set executable output directly to build directory
+	set_target_properties(${PROJECT_NAME}
+		PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "${PACKAGE_DIR}"
+	)
+
+	# Copy data directory (images, sounds, fonts, etc.)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/assets/data ${PACKAGE_DIR}/data
+		COMMENT "Copying data assets to build directory"
+	)
+
+	# Copy modules directory (Lua scripts)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/assets/modules ${PACKAGE_DIR}/modules
+		COMMENT "Copying modules to build directory"
+	)
+
+	# Copy layouts directory
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/assets/layouts ${PACKAGE_DIR}/layouts
+		COMMENT "Copying layouts to build directory"
+	)
+
+	# Copy mods directory
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/assets/mods ${PACKAGE_DIR}/mods
+		COMMENT "Copying mods to build directory"
+	)
+
+	# Copy init.lua configuration
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_SOURCE_DIR}/assets/init.lua ${PACKAGE_DIR}/init.lua
+		COMMENT "Copying init.lua configuration"
+	)
+
+	message(STATUS "Build deployment enabled - clean distribution will be created in build/ directory")
+
 else()
 	set_target_properties(${PROJECT_NAME}
 	PROPERTIES
