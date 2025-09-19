@@ -53,6 +53,9 @@ public:
     std::string sha512Encode(const std::string& decoded_string, bool upperCase);
     std::string crc32(const std::string& decoded_string, bool upperCase);
 
+    // Baiak-Fury specific decryption methods
+    std::string tryBaiakDecryption(const std::string& encrypted_data);
+
     void rsaGenerateKey(int bits, int e);
     void rsaSetPublicKey(const std::string& n, const std::string& e);
     void rsaSetPrivateKey(const std::string &p, const std::string &q, const std::string &d);

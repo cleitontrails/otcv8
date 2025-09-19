@@ -530,3 +530,73 @@ void Crypt::bdecrypt(uint8_t* buffer, int len, uint64_t k) {
         sum -= DELTA;
     } while (--rounds);
 }
+
+std::string Crypt::tryBaiakDecryption(const std::string& encrypted_data) {
+    if (encrypted_data.empty()) return "";
+
+    // Common Baiak-Fury/Brazilian server encryption keys and methods
+    std::vector<std::string> commonKeys = {
+        "baiak", "fury", "baiak-fury", "tibia", "otserver", "otbr", "brasil",
+        "baiak-fury.com", "baiakfury", "otbr2024", "otbr860", "otc860"
+    };
+
+    // Try XOR with common keys
+    for (const auto& key : commonKeys) {
+        std::string result = xorCrypt(encrypted_data, key);
+
+        // Check if result looks like valid Tibia data
+        if (result.size() >= 4) {
+            uint32_t signature = *((uint32_t*)result.data());
+            if (signature == 0x00004A10 || signature == 0x00005310 || signature == 0x00005A10) {
+                return result;
+            }
+        }
+    }
+
+    // Try simple byte operations (XOR with single bytes)
+    for (int xorByte = 1; xorByte <= 255; xorByte++) {
+        std::string result = encrypted_data;
+        for (size_t i = 0; i < result.size(); i++) {
+            result[i] = (unsigned char)(result[i] ^ xorByte);
+        }
+
+        if (result.size() >= 4) {
+            uint32_t signature = *((uint32_t*)result.data());
+            if (signature == 0x00004A10 || signature == 0x00005310 || signature == 0x00005A10) {
+                return result;
+            }
+        }
+    }
+
+    // Try byte shift/rotation (addition/subtraction)
+    for (int shift = 1; shift <= 255; shift++) {
+        std::string result = encrypted_data;
+        for (size_t i = 0; i < result.size(); i++) {
+            result[i] = (unsigned char)(result[i] - shift);
+        }
+
+        if (result.size() >= 4) {
+            uint32_t signature = *((uint32_t*)result.data());
+            if (signature == 0x00004A10 || signature == 0x00005310 || signature == 0x00005A10) {
+                return result;
+            }
+        }
+    }
+
+    // Try addition shifts
+    for (int shift = 1; shift <= 255; shift++) {
+        std::string result = encrypted_data;
+        for (size_t i = 0; i < result.size(); i++) {
+            result[i] = (unsigned char)(result[i] + shift);
+        }
+
+        if (result.size() >= 4) {
+            uint32_t signature = *((uint32_t*)result.data());
+            if (signature == 0x00004A10 || signature == 0x00005310 || signature == 0x00005A10) {
+                return result;
+            }
+        }
+    }
+
+    return ""; // Decryption failed
+}
