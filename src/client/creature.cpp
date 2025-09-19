@@ -725,7 +725,7 @@ void Creature::updateOutfitColor(Color color, Color finalColor, Color delta, int
         m_outfitColor = color + delta * m_outfitColorTimer.ticksElapsed();
 
         auto self = static_self_cast<Creature>();
-        m_outfitColorUpdateEvent = g_dispatcher.scheduleEvent([=] {
+        m_outfitColorUpdateEvent = g_dispatcher.scheduleEvent([self, color, finalColor, delta, duration] {
             self->updateOutfitColor(color, finalColor, delta, duration);
         }, 100);
     } else {
@@ -1197,7 +1197,7 @@ void Creature::updateProgressBar(uint32 duration, bool ltr)
             m_progressBarPercent = abs((m_progressBarTimer.ticksElapsed() / static_cast<double>(duration) * 100) - 100);
 
         auto self = static_self_cast<Creature>();
-        m_progressBarUpdateEvent = g_dispatcher.scheduleEvent([=] {
+        m_progressBarUpdateEvent = g_dispatcher.scheduleEvent([self, duration, ltr] {
             self->updateProgressBar(duration, ltr);
         }, 50);
     } else {
