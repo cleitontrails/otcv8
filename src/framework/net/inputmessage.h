@@ -32,7 +32,8 @@ class InputMessage : public LuaObject
 public:
     enum {
         BUFFER_MAXSIZE = 327680,
-        MAX_HEADER_SIZE = 12
+        MAX_HEADER_SIZE = 12,
+        MAX_STRING_LENGTH = 8192  // Maximum string length to prevent DoS attacks
     };
 
     InputMessage();

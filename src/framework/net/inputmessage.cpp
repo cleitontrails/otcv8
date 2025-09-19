@@ -81,6 +81,13 @@ uint64 InputMessage::getU64()
 std::string InputMessage::getString()
 {
     uint16 stringLength = getU16();
+
+    // Security: Prevent DoS attacks with oversized strings
+    if (stringLength > MAX_STRING_LENGTH) {
+        stdext::throw_exception("String length too large: " + std::to_string(stringLength) +
+                               " bytes (max: " + std::to_string(MAX_STRING_LENGTH) + ")");
+    }
+
     checkRead(stringLength);
     char* v = (char*)(m_buffer + m_readPos);
     m_readPos += stringLength;

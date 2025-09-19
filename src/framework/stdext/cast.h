@@ -27,6 +27,7 @@
 #include "demangle.h"
 
 #include <sstream>
+#include <limits>
 #include <iostream>
 #include <cstdlib>
 
@@ -95,7 +96,11 @@ template<>
 inline bool cast(const std::string& in, int& i) {
     long l;
     if(cast(in, l)) {
-        i=l;
+        // Security: Check for integer overflow when casting long to int
+        if(l < std::numeric_limits<int>::min() || l > std::numeric_limits<int>::max()) {
+            return false;
+        }
+        i = static_cast<int>(l);
         return true;
     }
     return false;

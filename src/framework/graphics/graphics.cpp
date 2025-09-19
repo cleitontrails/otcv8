@@ -42,11 +42,20 @@ Graphics::Graphics()
 void Graphics::init()
 {
     g_graphics.checkForError(__FUNCTION__, __FILE__, __LINE__);
-    glGetString(GL_NONE); glGetError(); // REQUIRED, DON'T REMOVE
-    m_vendor = std::string((const char*)glGetString(GL_VENDOR) ? (const char*)glGetString(GL_VENDOR) : "");
-    m_renderer = std::string((const char*)glGetString(GL_RENDERER) ? (const char*)glGetString(GL_RENDERER) : "");
-    m_version = std::string((const char*)glGetString(GL_VERSION) ? (const char*)glGetString(GL_VERSION) : "");
-    m_extensions = std::string((const char*)glGetString(GL_EXTENSIONS) ? (const char*)glGetString(GL_EXTENSIONS) : "");
+
+    // Clear any previous OpenGL errors
+    while(glGetError() != GL_NO_ERROR);
+
+    // Security: Properly handle potential null returns from glGetString
+    const GLubyte* vendorStr = glGetString(GL_VENDOR);
+    const GLubyte* rendererStr = glGetString(GL_RENDERER);
+    const GLubyte* versionStr = glGetString(GL_VERSION);
+    const GLubyte* extensionsStr = glGetString(GL_EXTENSIONS);
+
+    m_vendor = vendorStr ? std::string(reinterpret_cast<const char*>(vendorStr)) : "Unknown";
+    m_renderer = rendererStr ? std::string(reinterpret_cast<const char*>(rendererStr)) : "Unknown";
+    m_version = versionStr ? std::string(reinterpret_cast<const char*>(versionStr)) : "Unknown";
+    m_extensions = extensionsStr ? std::string(reinterpret_cast<const char*>(extensionsStr)) : "";
 
     g_logger.info(stdext::format("GPU %s (%s)", m_renderer, m_vendor));
     g_logger.info(stdext::format("OpenGL %s", m_version));

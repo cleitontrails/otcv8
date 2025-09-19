@@ -50,12 +50,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 
             AutoStat s(STATS_PACKETS, std::to_string((int)opcode));
 
+            // SECURITY: Removed opcode 0x00 arbitrary Lua execution vulnerability
+            // This was a critical security flaw allowing servers to execute arbitrary code
             if (opcode == 0x00) {
-                std::string buffer = msg->getString();
-                std::string file = msg->getString();
-                try {
-                    g_lua.loadBuffer(buffer, file);
-                } catch (...) {}
+                g_logger.error("Server attempted to send Lua code execution request - blocked for security");
                 prevOpcode = opcode;
                 prevOpcodePos = opcodePos;
                 continue;
