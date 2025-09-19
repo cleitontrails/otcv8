@@ -135,3 +135,5 @@ vcpkg_installed
 
 # My anotation file
 anotations.md
+
+init.lua

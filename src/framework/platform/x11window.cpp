@@ -1113,7 +1113,10 @@ std::string X11Window::getClipboardText()
 
     std::string clipboardText;
     if(ownerWindow != None) {
-        XConvertSelection(m_display, clipboard, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
+        Atom utf8_atom = XInternAtom(m_display, "UTF8_STRING", False);
+        Atom target_property = XInternAtom(m_display, "CLIPBOARD_TARGET", False);
+
+        XConvertSelection(m_display, clipboard, utf8_atom, target_property, m_window, CurrentTime);
         XFlush(m_display);
 
         // hack to wait SelectioNotify event, otherwise we will get wrong clipboard pastes
@@ -1125,8 +1128,8 @@ std::string X11Window::getClipboardText()
         int format;
         ulong len, bytesLeft;
         char *data;
-        XGetWindowProperty(m_display, ownerWindow,
-                            XA_PRIMARY, 0, 10000000L, 0, XA_STRING,
+        XGetWindowProperty(m_display, m_window,
+                            target_property, 0, 10000000L, 0, AnyPropertyType,
                             &type,
                             &format,
                             &len,
@@ -1137,6 +1140,7 @@ std::string X11Window::getClipboardText()
                 clipboardText = stdext::utf8_to_latin1(data);
             else
                 clipboardText = data;
+            XFree(data);
         }
     }
 
