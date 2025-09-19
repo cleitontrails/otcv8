@@ -56,7 +56,7 @@ cmake --build . --parallel $(nproc)
 
 #### Project Structure
 
-After building, the project creates a clean deployment in the `package/` directory:
+After building, the project creates a clean deployment in the `build/` directory:
 
 ```
 /
@@ -66,28 +66,28 @@ After building, the project creates a clean deployment in the `package/` directo
 │   ├── modules/   # Lua modules
 │   ├── layouts/   # UI layouts
 │   ├── mods/      # Game modifications
-│   ├── init.lua   # Configuration file
-│   └── initExample.lua # Template configuration
-├── package/       # Clean deployment directory
-│   ├── otclient   # Executable
+│   └── init.lua   # Configuration file
+├── libs/          # vcpkg dependencies
+├── build/         # Clean deployment directory
+│   ├── otclient   # Executable (ready to run)
 │   ├── data/      # Game assets
 │   ├── modules/   # Lua modules
 │   ├── layouts/   # UI layouts
 │   ├── mods/      # Game modifications
 │   └── init.lua   # Configuration file
-└── build/         # CMake build artifacts
+└── cmake/         # CMake modules and helpers
 ```
 
 #### Running
 
 ```bash
-cd package
+cd build
 ./otclient
 ```
 
 #### Configuration
 
-Edit `assets/init.lua` to configure servers, services, and client settings before building, or edit `package/init.lua` in the deployed version.
+Edit `assets/init.lua` to configure servers, services, and client settings before building, or edit `build/init.lua` in the deployed version.
 
 ### Credits
 
