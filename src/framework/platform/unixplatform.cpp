@@ -149,12 +149,14 @@ std::string Platform::getCPUName()
     std::ifstream in("/proc/cpuinfo");
     while(getline(in, line)) {
         auto strs = stdext::split(line, ":");
-        std::string first = strs[0];
-        std::string second = strs[1];
-        stdext::trim(first);
-        stdext::trim(second);
-        if(strs.size() == 2 && first == "model name")
-            return second;
+        if(strs.size() == 2) {
+            std::string first = strs[0];
+            std::string second = strs[1];
+            stdext::trim(first);
+            stdext::trim(second);
+            if(first == "model name")
+                return second;
+        }
     }
     return std::string();
 }

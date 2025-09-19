@@ -10,7 +10,7 @@ Services = {
   stats = "", -- --"http://yourwebsite/api/stats.php"
   crash = "", --"http://yourwebsite/api/crash.php",
   feedback = "",--"http://yourwebsite/api/feedback.php",
-  status = "http://docs.opentibiabr.com" --http://yourwebsite/api/status.php"
+  status = "" --http://yourwebsite/api/status.php"
 }
 
 -- Servers accept http login url, websocket login url or ip:port:version

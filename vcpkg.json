@@ -8,7 +8,6 @@
     "glew",
     "pugixml",
     "physfs",
-    "openal-soft",
     "openssl",
     "libogg",
     "libvorbis",
