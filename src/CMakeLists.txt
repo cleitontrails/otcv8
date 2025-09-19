@@ -14,7 +14,7 @@ option(TOGGLE_PRE_COMPILED_HEADER "Use precompiled header (speed up compile)" OF
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
 option(BUILD_STATIC_LIBRARY "Build using static libraries" OFF)
-option(WITH_ENCRYPTION "Enable encryption support for Tibia data files" ON)
+option(WITH_ENCRYPTION "Enable encryption support for Tibia data files" OFF)
 
 # *****************************************************************************
 # Cmake Features

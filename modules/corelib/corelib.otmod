@@ -31,4 +31,3 @@ Module
     dofile 'base64'
     dofile 'json'
     dofile 'http'
-    dofile 'test'

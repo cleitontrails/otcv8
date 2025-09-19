@@ -57,30 +57,15 @@ UIWidget
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     width: 64
-    
+    visible: false
+
     $!mobile:
       visible: false
       width: 0
-    
+
     layout:
       type: verticalBox
       fit-children: true
-      
-    GameAction
-      id: use
-      @onSetup: self.image:setImageSource("/images/game/mobile/use")
-    GameAction
-      id: attack
-      @onSetup: self.image:setImageSource("/images/game/mobile/attack")
-    GameAction
-      id: follow
-      @onSetup: self.image:setImageSource("/images/game/mobile/follow")
-    GameAction
-      id: look
-      @onSetup: self.image:setImageSource("/images/game/mobile/look")
-    GameAction
-      id: chat
-      @onSetup: self.image:setImageSource("/images/game/mobile/chat")
     
   Panel
     id: gameLeftPanels

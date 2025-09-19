@@ -336,11 +336,8 @@ void ThingType::unserialize(uint16 clientId, ThingCategory category, const FileS
         int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
         total_sprites.push_back(totalSprites);
 
-        // Safety check: prevent unreasonable memory allocation (1M sprites = ~4GB)
-        if((totalSpritesCount+totalSprites) > 1000000) {
-            stdext::throw_exception(stdext::format("thing type has excessive sprites: %d (max: 1000000)",
-                                                   totalSpritesCount+totalSprites));
-        }
+        if((totalSpritesCount+totalSprites) > 4096)
+            stdext::throw_exception("a thing type has more than 4096 sprites");
 
         m_spritesIndex.resize((totalSpritesCount+totalSprites));
         for(int i = totalSpritesCount; i < (totalSpritesCount+totalSprites); i++)

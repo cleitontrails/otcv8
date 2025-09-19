@@ -7,7 +7,6 @@ Module
   scripts: [ widgets/uigamemap, gameinterface ]
   load-later:
     - game_buttons
-    - game_hotkeys
     - game_questlog
     - game_textmessage
     - game_console
@@ -22,7 +21,6 @@ Module
     - game_npctrade
     - game_textwindow
     - game_playertrade
-    - game_bugreport
     - game_playerdeath
     - game_playermount
     - game_ruleviolation
@@ -32,7 +30,6 @@ Module
     - game_modaldialog
     - game_unjustifiedpoints
     - game_walking
-    - game_shop
     - game_itemselector
     - client_textedit
     - client_profiles
