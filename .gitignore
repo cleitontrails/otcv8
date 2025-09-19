@@ -46,7 +46,8 @@ tags
 
 # Config files
 config.otml
-init.lua
+/init.lua
+/build/init.lua
 
 # Personal files
 anotations.md
