@@ -15,7 +15,7 @@ Services = {
 
 -- Simple server configuration - only IP:PORT needed (8.6 protocol hardcoded)
 Servers = {
-  ["Baiak-Fury"] = "baiakeiros.com.br:7171"  -- No version needed - always 8.6
+  ["Baiak-Fury"] = "baiakeiros.com.br:7171:860"  -- No version needed - always 8.6
 }
 
 -- Simplified configuration for 8.6 only
